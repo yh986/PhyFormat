@@ -16,4 +16,4 @@ WriteFasta(y, filename, multiline = 60) and WritePhylip(y, filename, blocks = 5,
 
 **SubsetNewick.R**
 
-I couldn't find an R package that could easily 'subset a Newick-format phylogenetic tree! SubsetNewick(tipnames, newicktree) will remove branches and nodes from the 'newicktree' (string in Newick format) such that all that is left of the tree is the branches named in the 'tipnames' array, and the internal nodes connecting them. When branches are merged (since useless internal nodes are removed), they are simply added together, which may not actually be phylogenetically accurate, depending on the distance model.
+I couldn't find an R package that could easily subset a Newick-format phylogenetic tree! SubsetNewick(tipnames, newicktree) will remove branches and nodes from the 'newicktree' (string in Newick format) such that all that is left of the tree is the branches named in the 'tipnames' array, and the internal nodes connecting them. When branches are merged (since useless internal nodes are removed), they are simply added together, which may not actually be phylogenetically accurate, depending on the distance model.
