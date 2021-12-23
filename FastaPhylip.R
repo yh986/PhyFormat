@@ -29,6 +29,30 @@ validate_phytools_msa <- function (x) {
   x
 }
 
+print.phytools_msa <- function(x, ...) {
+  numsequences <- length(x$Headings)
+  cat("MSA with", numsequences, "sequences. \n")
+  
+  printtruncate <- function(str, n) {
+    if (nchar(str) > n) {
+      paste0(substr(str, 1, n - 3), "...")
+    }
+    else
+    {
+      substr(str, 1, n)
+    }
+  }
+  
+  for (i in 1:min(numsequences, 5)) {
+    cat(paste0("\"", printtruncate(x$Headings[i], 15), "\""), ":", printtruncate(x$Sequences[i], 20))
+  }
+  if (numsequences > 5) {
+    cat("...")
+  }
+  
+  invisible(x)
+}
+
 ReadFasta <- function(filename) {
   fa <- readLines(filename)
   faheaderlines <- which(grepl("^>.*", fa))
@@ -45,7 +69,9 @@ ReadFasta <- function(filename) {
     headingvector <- c(headingvector, heading_i)
   }
   
-  return (new_phytools_msa(headingvector, seqvector))
+  out_phytools_msa <- new_phytools_msa(headingvector, seqvector)
+  validate_phytools_msa(out_phytools_msa)
+  return (out_phytools_msa)
 }
 
 
@@ -89,7 +115,9 @@ ReadPhylip <- function(filename) {
   headings <- substr(rawheads, 1, n)
   headings <- trimws(headings, which = "right")
   
-  return (new_phytools_msa(headings, sequences))
+  out_phytools_msa <- new_phytools_msa(headings, sequences)
+  validate_phytools_msa(out_phytools_msa)
+  return (out_phytools_msa)
 }
 
 #E.g. multiline = 60 to break up sequences every 60 positions
