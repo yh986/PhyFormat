@@ -1,3 +1,34 @@
+new_phytools_msa <- function (headings, sequences) {
+  stopifnot(is.character(headings) || is.character(sequences))
+  structure(list(Headings = headings, Sequences = sequences), class = "phytools_msa")
+}
+
+validate_phytools_msa <- function (x) {
+  unclass <- unclass(x)
+  #Verify that there are as many headings as sequences
+  
+  if (length(unclass$Headings) != length(unclass$Sequences)) {
+    stop("There must be as many headings as there are sequences")
+  }
+  #Additional criteria:
+  #-Headings should be unique (unchecked)
+  #-Sequences should have valid characters (unchecked)
+  #-Sequences should have the same length
+  
+  sequences <- unclass$Sequences
+  samelengths <- all(nchar(sequences) == nchar(sequences[1]))
+  
+  if (is.na(samelengths)) {
+    stop("Undefined sequence")
+  }
+  
+  if (!isTRUE(samelengths)) {
+    stop("Alignment lengths have different lengths")
+  }
+  
+  x
+}
+
 ReadFasta <- function(filename) {
   fa <- readLines(filename)
   faheaderlines <- which(grepl("^>.*", fa))
@@ -13,7 +44,8 @@ ReadFasta <- function(filename) {
     seqvector <- c(seqvector, seq_i)
     headingvector <- c(headingvector, heading_i)
   }
-  return (list(Headings = headingvector, Sequences = seqvector))
+  
+  return (new_phytools_msa(headingvector, seqvector))
 }
 
 
@@ -56,14 +88,16 @@ ReadPhylip <- function(filename) {
                       tails_nospace)
   headings <- substr(rawheads, 1, n)
   headings <- trimws(headings, which = "right")
-  return (list(Headings = headings, Sequences = sequences)) 
+  
+  return (new_phytools_msa(headings, sequences))
 }
 
 #E.g. multiline = 60 to break up sequences every 60 positions
 #multiline = -1 for no multiline
-WriteFasta <- function(y, filename, multiline = 60) {
-  headings <- y[["Headings"]]
-  sequences <- y[["Sequences"]]
+WriteFasta <- function(x, filename, multiline = 60) {
+  x <- unclass(x)
+  headings <- x[["Headings"]]
+  sequences <- x[["Sequences"]]
   
   writestring <- NULL
   for (i in 1:length(headings)) {
@@ -99,9 +133,10 @@ WriteFasta <- function(y, filename, multiline = 60) {
   close(fileConn)
 }
 
-WritePhylip <- function(y, filename, blocks = 5, blocksize = 10) {
-  headings <- y[["Headings"]]
-  sequences <- y[["Sequences"]]
+WritePhylip <- function(x, filename, blocks = 5, blocksize = 10) {
+  x <- unclass(x)
+  headings <- x[["Headings"]]
+  sequences <- x[["Sequences"]]
   #Write the first line
   N <- length(headings)
   len <- nchar(sequences[[1]])
