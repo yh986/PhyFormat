@@ -1,8 +1,10 @@
+#' @export
 new_phytools_msa <- function (headings, sequences) {
   stopifnot(is.character(headings) || is.character(sequences))
   structure(list(Headings = headings, Sequences = sequences), class = "phytools_msa")
 }
 
+#' @export
 validate_phytools_msa <- function (x) {
   unclass <- unclass(x)
   #Verify that there are as many headings as sequences
@@ -53,6 +55,7 @@ print.phytools_msa <- function(x, ...) {
   invisible(x)
 }
 
+#' @export
 ReadFasta <- function(filename) {
   fa <- readLines(filename)
   faheaderlines <- which(grepl("^>.*", fa))
@@ -74,7 +77,7 @@ ReadFasta <- function(filename) {
   return (out_phytools_msa)
 }
 
-
+#' @export
 ReadPhylip <- function(filename) {
   phylip <- readLines(filename)
   
@@ -122,6 +125,7 @@ ReadPhylip <- function(filename) {
 
 #E.g. multiline = 60 to break up sequences every 60 positions
 #multiline = -1 for no multiline
+#' @export
 WriteFasta <- function(x, filename, multiline = 60) {
   x <- unclass(x)
   headings <- x[["Headings"]]
@@ -161,6 +165,7 @@ WriteFasta <- function(x, filename, multiline = 60) {
   close(fileConn)
 }
 
+#' @export
 WritePhylip <- function(x, filename, blocks = 5, blocksize = 10) {
   x <- unclass(x)
   headings <- x[["Headings"]]
