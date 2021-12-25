@@ -34,6 +34,7 @@ RemoveSingletonTips <- function(Tree) {
 }
 
 #Removes deep internal singletons, such that all subtrees have siblings.
+#' @export
 RemoveSingletons <- function(Tree) {
   
   i <- 1
