@@ -1,27 +1,51 @@
+#' FASTA file reader
+#'
+#' Creates a new physeq object from a FASTA-format file.
+#' @param filename The name of the file to be read
 #' @export
+#' @examples 
+#' x <- ReadFasta("Seqs.fa")
+#' x$Sequences #Get or modify sequences
 ReadFasta <- function(filename) {
+  
+  if (!file.exists(filename)) {
+    stop("Could not find the specified file")
+  }
+  
   fa <- readLines(filename)
   faheaderlines <- which(grepl("^>.*", fa))
   numberofseqs <- length(faheaderlines)
-  separators <- c(faheaderlines, length(fa) + 1)
+  separators <- c(faheaderlines, length(fa) + 1) #Get the line numbers corresponding to the beginnings and ends of sequences
   seqvector <- NULL
-  headingvector <- NULL
+  headervector <- NULL
   for (i in 1:numberofseqs) {
     beginseq <- separators[i] + 1
     endseq <- separators[i + 1] - 1
     seq_i <- paste0(fa[beginseq:endseq], collapse = "")
-    heading_i <- substr(fa[separators[i]], 2, nchar(fa[separators[i]]))
+    header_i <- substr(fa[separators[i]], 2, nchar(fa[separators[i]]))
     seqvector <- c(seqvector, seq_i)
-    headingvector <- c(headingvector, heading_i)
+    headervector <- c(headervector, header_i)
   }
   
-  out_phytools_msa <- new_phytools_msa(headingvector, seqvector)
-  validate_phytools_msa(out_phytools_msa)
-  return (out_phytools_msa)
+  out_physeq <- new_physeq(headervector, seqvector)
+  validate_physeq(out_physeq)
+  return (out_physeq)
 }
 
+#' PHYLIP file reader
+#' 
+#' Creates a new physeq object from an existing PHYILP-format file.
+#' @param filename The name of the file to be read
 #' @export
+#' @examples 
+#' x <- ReadPhylip("MSA.phy")
+#' x$Sequences #Get or modify sequences
 ReadPhylip <- function(filename) {
+  
+  if (!file.exists(filename)) {
+    stop("Could not find the specified file")
+  }
+  
   phylip <- readLines(filename)
   
   N <- as.numeric(sub("^[^0-9]*([0-9]+)[^0-9]*([0-9]+)[^0-9]*$", "\\1", phylip[1]))
@@ -58,25 +82,33 @@ ReadPhylip <- function(filename) {
   }
   sequences <- paste0(substr(rawheads, n + 1, 10), 
                       tails_nospace)
-  headings <- substr(rawheads, 1, n)
-  headings <- trimws(headings, which = "right")
+  headers <- substr(rawheads, 1, n)
+  headers <- trimws(headers, which = "right")
   
-  out_phytools_msa <- new_phytools_msa(headings, sequences)
-  validate_phytools_msa(out_phytools_msa)
-  return (out_phytools_msa)
+  out_physeq <- new_physeq(headers, sequences)
+  validate_physeq(out_physeq)
+  return (out_physeq)
 }
 
-#E.g. multiline = 60 to break up sequences every 60 positions
-#multiline = -1 for no multiline
+
+#' FASTA file writer
+#' 
+#' Writes a fasta file from a physeq object.
+#' @param x The physeq object to read from
+#' @param filename The name of the file to create
+#' @param multiline How many characters per line, for an interleaved FASTA format. Use 'multiline = -1' for sequential format (no character limit). Default = 60
 #' @export
+#' @examples 
+#' x <- ReadPhylip("MSA.phy") #Creates the physeq object 'x'
+#' WriteFasta(x, "MSA.fa")
 WriteFasta <- function(x, filename, multiline = 60) {
   x <- unclass(x)
-  headings <- x[["Headings"]]
+  headers <- x[["Headers"]]
   sequences <- x[["Sequences"]]
   
   writestring <- NULL
-  for (i in 1:length(headings)) {
-    writestring <- c(writestring, paste0(">", headings[i]))
+  for (i in 1:length(headers)) {
+    writestring <- c(writestring, paste0(">", headers[i]))
     
     if (multiline <= 0)
     {
@@ -108,17 +140,34 @@ WriteFasta <- function(x, filename, multiline = 60) {
   close(fileConn)
 }
 
+#' PHYLIP-format file sequence alignment writer
+#' 
+#' Writes a PHYLIP multiple sequence alignment file from a physeq object. If sequences are not the same length, there will be an error
+#' @param x The physeq object to read from
+#' @param filename The name of the file to create
+#' @param blocks The number of sequences per block. Default = 5
+#' @param blocksize The number of characters per sequence per block. Default = 10
+#' @examples 
+#' x <- ReadFasta("MSA.fa") #Creates the physeq object 'x'
+#' WritePhylip(x, "MSA.phy")
+#' y <- physeq(c("Seq 1", "Seq 2"), c("RRARRPR", "PKKKRKV"))
+#' WritePhylip(y, "Seqs.phy")
 #' @export
 WritePhylip <- function(x, filename, blocks = 5, blocksize = 10) {
   x <- unclass(x)
-  headings <- x[["Headings"]]
+  headers <- x[["Headers"]]
   sequences <- x[["Sequences"]]
+  
+  if (!all(nchar(headers) == nchar(headers[1]))) {
+    stop("Sequences are not the same length")
+  }
+  
   #Write the first line
-  N <- length(headings)
+  N <- length(headers)
   len <- nchar(sequences[[1]])
   writestring <- paste0(N, " ", len)
   #Write the first paragraph
-  paragraph <- paste0(headings, "          ")
+  paragraph <- paste0(headers, "          ")
   paragraph <- substr(paragraph, 1, 10)
   paragraph <- paste0(paragraph, " ")
   n <- 0 #Block counter
