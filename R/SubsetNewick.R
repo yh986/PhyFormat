@@ -1,7 +1,6 @@
 #Input a phylogenetic tree in the Newick format.
 #If a 'leaf' node has no siblings, then the parent of the leaf is a useless 'singleton' internal node.
 #Then, merge the branches together to remove the node, until leaves have siblings.
-  
 RemoveSingletonTips <- function(Tree) {
   Iterativetree <- Tree
   while (TRUE) {
@@ -34,7 +33,6 @@ RemoveSingletonTips <- function(Tree) {
 }
 
 #Removes deep internal singletons, such that all subtrees have siblings.
-#' @export
 RemoveSingletons <- function(Tree) {
   
   i <- 1
@@ -70,14 +68,12 @@ RemoveSingletons <- function(Tree) {
   return(Iterativetree)
 }
 
-#Subset a newick tree by a specified set of tips;
-#singleton branches are merged by simple addition (by RemoveSingletons).
-#Leaf node names of the newicktree can only have
-#Alphanumeric characters, spaces, dashes, or underscores.
-#NO other punctuation marks! This will mess up the parsing.
-
-#Bug: if there is just one header provided, it will fail to
-#remove singletons (because of lack of commas)
+#' Subset a newick tree
+#' 
+#' Simplifies a newick tree by keeping only the specified subset of tips and the internal nodes joining them. Useless internal branches are merged by simple addition.
+#' @param tipnames A character vector with the names of the tips to keep, which must be a subset of the tip names in 'newicktree'
+#' @param newicktree The newick-format tree. Tip names (leaf node names) must not contain punctuation marks besides dashes or underscores
+#' @export
 SubsetNewick <- function(tipnames, newicktree) {
   tree_protected <- newicktree
   
@@ -127,5 +123,3 @@ SubsetNewick <- function(tipnames, newicktree) {
   return(RemoveSingletons(tree_purged))
   
 }
-
-
