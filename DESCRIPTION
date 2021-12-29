@@ -1,5 +1,5 @@
 Package: phyformat
-Title: Formatting Tools For Phylogenetic Data
+Title: Format Bioinformatics Data
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Yu Han",
@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "yu.mao@mail.mcgill.ca",
            comment = c(ORCID = "0000-0002-8827-3673"))
-Description: Tools to manipulate phylogenetic data, in particular, to load and convert data in FASTA/PHYLIP formats; and take subsets of Newick trees.
+Description: Read, write and interconvert between FASTA and PHYLIP sequence data formats.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
