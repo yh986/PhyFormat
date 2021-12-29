@@ -6,7 +6,7 @@ Helper functions in R to help with some phylogenetic data formatting.
 install.packages("devtools")
 devtools::install_github("yh986/phyformat")
 ```
-## Examples
+## Usage examples
 
 ```
 x <- ReadFasta("sequences.fa") #Creates a physeq object from an existing FASTA file
