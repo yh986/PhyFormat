@@ -1,10 +1,11 @@
 # PhyFormat
 Helper functions in R to help with some phylogenetic data formatting.
 
-Installation:
+## Installation:
+```
 install.packages("devtools")
 devtools::install_github("yh986/phyformat")
-
+```
 
 ReadFasta(filename) and ReadPhylip(filename) are functions to read fasta or phylip files into a 'physeq' object.
 
