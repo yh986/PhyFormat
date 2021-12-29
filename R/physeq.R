@@ -38,6 +38,7 @@ validate_physeq <- function (x) {
 }
 
 #S3 method for displaying a physeq
+#' @export
 print.physeq <- function(x, ...) {
   numsequences <- length(x$Headings)
   cat(numsequences, "sequences. \n")
@@ -53,7 +54,7 @@ print.physeq <- function(x, ...) {
   }
   
   for (i in 1:min(numsequences, 5)) {
-    cat(paste0("\"", printtruncate(x$Headings[i], 15), "\""), ":", printtruncate(x$Sequences[i], 20))
+    cat(paste0("\"", printtruncate(x$Headings[i], 15), "\""), ":", printtruncate(x$Sequences[i], 20), "\n")
   }
   if (numsequences > 5) {
     cat("...")
